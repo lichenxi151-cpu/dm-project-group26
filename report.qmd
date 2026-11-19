@@ -85,7 +85,19 @@ In urban economics, shorter commuting times to job centers make locations more a
 
 Comparing the three concentric rings of Île-de-France makes this question especially interesting. Inside Paris (75), Metro stations are everywhere—usually within a few hundred meters—so being slightly closer to a station may not change prices much. In contrast, in the Petite Couronne (92, 93, 94) and especially the Grande Couronne (77, 78, 91, 95), stations are much farther apart and serve as essential commuter links into the urban core. We expect walking-distance access to an RER or train station in the suburbs to carry a much stronger price premium than in the city center.
 
-6.  Data Cleaning & Merging PlanBecause the DVF housing records and IDFM transit stops do not share a common ID column, we prepare and match them through the following steps:Residential Filtering (DVF): Keep only residential sales (Appartement and Maison) with valid positive prices and living areas, remove duplicate multi-lot records, and trim extreme outliers (under €1,000/$m^2$ or over €30,000/$m^2$).Urban Ring Grouping: Classify each property into Paris Intra-Muros (75), Petite Couronne (92, 93, 94), or Grande Couronne (77, 78, 91, 95) using Code.departement.Rail Transit Filtering (IDFM): Filter the IDFM table to keep fixed-guideway transit (Metro, RER, Train, Tramway) and exclude regular street buses.Spatial Distance Matching (sf): In the next phase, project both datasets onto the French metric coordinate system (Lambert 93 / EPSG:2154) using the sf package to calculate the exact distance (in meters) from each house/apartment to the nearest rail station. \## 7. Exploratory Plot of Target Variable (`price_m2`)
+6.  **Data Cleaning & Merging Plan**
+
+    Since the DVF property records and IDFM transit stops have no common key, we clean and link them in four steps:
+
+    1.  **Filter Residential Sales (DVF):** Keep only apartments and houses (`Appartement` and `Maison`) with valid positive prices and floor areas, drop duplicate multi-lot entries, and exclude extreme price outliers below €1,000/$m^2$ or above €30,000/$m^2$.
+
+    2.  **Group by Urban Ring:** Use `Code.departement` to assign each property to one of three zones: Paris Intra-Muros (`75`), Petite Couronne (`92`, `93`, `94`), or Grande Couronne (`77`, `78`, `91`, `95`).
+
+    3.  **Select Rail Transit (IDFM):** Narrow the transit dataset down to fixed-guideway rail modes (Metro, RER, Train, and Tramway) while dropping regular bus stops.
+
+    4.  **Spatial Matching (`sf`):** Reproject both datasets into the French metric coordinate system (Lambert 93 / EPSG:2154) using the `sf` package to compute the straight-line distance in meters from each property to its nearest rail station.
+
+    **7. Exploratory Plot of Target Variable (`price_m2`)**
 
 ```{r}
 #| label: target-variable-plot
