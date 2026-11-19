@@ -11,29 +11,26 @@ format:
 
 ## 1. Project Repository & Data Sources
 
-* **GitHub Repository:** [https://github.com/lichenxi151-cpu/dm-project-group26](https://github.com/lichenxi151-cpu/dm-project-group26)
+- **GitHub Repository:** <https://github.com/lichenxi151-cpu/dm-project-group26>
 
 ### Data Sources & Reproduction Instructions
 
-1. **Demandes de Valeurs Foncières (DVF - 2025):**
-   * **Direct Link:** [https://files.data.gouv.fr/dvf/](https://files.data.gouv.fr/dvf/)
-   * **Reproduction Steps:** Navigate to the 2025 directory and download `ValeursFoncieres-2025.txt` (pipe-delimited raw file covering all of France). Because the full national file exceeds GitHub's 100 MB single-file limit, we filtered the raw dataset in R to retain exclusively the eight administrative departments of the Île-de-France region (`Code.departement %in% c("75", "77", "78", "91", "92", "93", "94", "95")`) and exported the resulting regional raw subset as `data/dvf_idf_2025.csv`.
+1.  **Demandes de Valeurs Foncières (DVF - 2025):**
+    - **Direct Link:** <https://files.data.gouv.fr/dvf/>
+    - **Reproduction Steps:** Navigate to the 2025 directory and download `ValeursFoncieres-2025.txt` (pipe-delimited raw file covering all of France). Because the full national file exceeds GitHub's 100 MB single-file limit, we filtered the raw dataset in R to retain exclusively the eight administrative departments of the Île-de-France region (`Code.departement %in% c("75", "77", "78", "91", "92", "93", "94", "95")`) and exported the resulting regional raw subset as `data/dvf_idf_2025.csv`.
+2.  **Arrêts et lignes associées (Île-de-France Mobilités - IDFM):**
+    - **Direct Link:** <https://data.iledefrance-mobilites.fr/explore/dataset/arrets-lignes/information/>
+    - **Reproduction Steps:** Open the official IDFM portal link above, click on the **Export** tab in the top navigation bar, and select **CSV** (semicolon-delimited) to download the complete inventory directly into `data/arrets-lignes.csv` without registration.
 
-2. **Arrêts et lignes associées (Île-de-France Mobilités - IDFM):**
-   * **Direct Link:** [https://data.iledefrance-mobilites.fr/explore/dataset/arrets-lignes/information/](https://data.iledefrance-mobilites.fr/explore/dataset/arrets-lignes/information/)
-   * **Reproduction Steps:** Open the official IDFM portal link above, click on the **Export** tab in the top navigation bar, and select **CSV** (semicolon-delimited) to download the complete inventory directly into `data/arrets-lignes.csv` without registration.
+------------------------------------------------------------------------
 
----
+## **2. Description of Data Sources**
 
-## 2. Description of Data Sources
+We use two public datasets from official French agencies to study housing prices and transit access in Île-de-France.
 
-The empirical analysis relies on two distinct, authoritative French administrative open datasets covering real estate transactions and public transit infrastructure across the Greater Paris (*Île-de-France*) region.
+First, real estate transaction records are taken from the 2025 *Demandes de Valeurs Foncières* (DVF) database managed by the French Ministry of Finance (DGFiP). Because notaries are legally required to register all property transfers, DVF provides actual closing prices rather than listing estimates. The dataset covers transaction dates, sale prices (`Valeur.fonciere`), building types (`Type.local`), interior floor space (`Surface.reelle.bati`), room counts (`Nombre.pieces.principales`), and administrative codes. Our working subset (`dvf_idf_2025.csv`) extracts all 2025 records across the eight Île-de-France departments (75, 92, 93, 94, 77, 78, 91, and 95).
 
-The first dataset is the **Demandes de Valeurs Foncières (DVF)** for the full calendar year 2025, produced and maintained by the French Directorate General of Public Finances (*Direction Générale des Finances Publiques* – DGFiP) and published via the national open data portal *data.gouv.fr*. The DVF database is compiled through the mandatory legal registration of all notarial property deeds and land transfers recorded across France. Whenever a real estate asset changes ownership, public notaries transmit standardized declaration records to the tax administration. Consequently, the dataset provides exhaustive, administrative-grade coverage of market transactions rather than self-reported listing prices. Each observation captures granular transaction metadata, including the exact transfer date, the declared monetary transaction value in euros (`Valeur.fonciere`), physical building attributes such as property category (`Type.local`, distinguishing apartments from single-family houses), actual built living surface in square meters (`Surface.reelle.bati`), number of principal rooms (`Nombre.pieces.principales`), and hierarchical administrative location identifiers (department code, INSEE municipal code, postal code, and cadastral parcel references). To comply with repository storage limits while preserving full regional fidelity, our raw working file (`dvf_idf_2025.csv`) encompasses all 2025 property mutations recorded within the eight departments of Île-de-France: Paris (`75`), Hauts-de-Seine (`92`), Seine-Saint-Denis (`93`), Val-de-Marne (`94`), Seine-et-Marne (`77`), Yvelines (`78`), Essonne (`91`), and Val-d'Oise (`95`).
-
-The second dataset is the **Référentiel des arrêts et lignes associées**, published by **Île-de-France Mobilités (IDFM)**, the regional public transport authority coordinating mobility networks across Greater Paris. Unlike DVF, which originates from fiscal and legal registries, the IDFM dataset is synthesized from the operational Geographic Information Systems (GIS) of regional public transit operators—principally RATP, SNCF Voyageurs, and OPTILE. It provides a comprehensive territorial inventory of all commercial passenger boarding nodes and their associated transit lines across the entire region. Each record identifies a specific stop-line pairing alongside its official stop identifier (`id`), station name (`nom_commune` / stop name), transport mode classification (`mode`, separating heavy rail/RER, metro, tramway, and surface bus routes), operating agency (`operateur`), and exact geographic coordinates in WGS84 latitude and longitude (`stop_lat`, `stop_lon`). Combining DGFiP fiscal transaction registries with IDFM operational transport GIS records creates a rich cross-domain spatial dataset ideally suited for urban economic analysis.
-
----
+Second, transit network data comes from Île-de-France Mobilités (IDFM) via its *arrêts et lignes associées* dataset, which aggregates GIS station data from RATP, SNCF, and OPTILE. Each entry links a transit stop to a specific line and records the stop ID (`id`), municipality (`nom_commune`), transit mode (`mode`), operator (`operateur`), and latitude/longitude coordinates (`stop_lat`, `stop_lon`). Combining DGFiP sale prices with IDFM stop coordinates provides the spatial foundation needed to measure how station proximity affects housing values.
 
 ## 3. Summary Information of Raw Data Files
 
@@ -80,19 +77,15 @@ idfm_summary <- data.frame(
 kable(idfm_summary)
 ```
 
+4.  Key VariablesValeur.fonciere (DVF): Total declared sale price of the property in Euros (€).Surface.reelle.bati (DVF): Built interior living area in square meters ($m^2$).Type.local (DVF): Building type (e.g., Appartement or Maison).Code.departement / Code.postal (DVF): Department code (75 to 95) and postal code used to group properties by urban ring.price_m2 (Target Variable): Price per square meter (€/$m^2$), calculated as Valeur.fonciere / Surface.reelle.bati.mode (IDFM): Type of transport service (Metro, RER, Train, Tramway, Bus).stop_lon & stop_lat (IDFM): Longitude and latitude coordinates of each transit stop.
 
-
-4. Key VariablesValeur.fonciere (DVF): Total declared sale price of the property in Euros (€).Surface.reelle.bati (DVF): Built interior living area in square meters ($m^2$).Type.local (DVF): Building type (e.g., Appartement or Maison).Code.departement / Code.postal (DVF): Department code (75 to 95) and postal code used to group properties by urban ring.price_m2 (Target Variable): Price per square meter (€/$m^2$), calculated as Valeur.fonciere / Surface.reelle.bati.mode (IDFM): Type of transport service (Metro, RER, Train, Tramway, Bus).stop_lon & stop_lat (IDFM): Longitude and latitude coordinates of each transit stop.
-
-5. Research Question
-In this project, we study how access to rail public transit affects residential housing prices in Île-de-France. Specifically, our main question is: How much of a price premium does proximity to fixed-guideway rail transit stations (Metro, RER, Transilien, and Tramway) add to residential property prices, and how does this effect differ between central Paris (75), the inner suburbs (Petite Couronne), and the outer suburbs (Grande Couronne)?
+5.  Research Question In this project, we study how access to rail public transit affects residential housing prices in Île-de-France. Specifically, our main question is: How much of a price premium does proximity to fixed-guideway rail transit stations (Metro, RER, Transilien, and Tramway) add to residential property prices, and how does this effect differ between central Paris (75), the inner suburbs (Petite Couronne), and the outer suburbs (Grande Couronne)?
 
 In urban economics, shorter commuting times to job centers make locations more attractive, which should be reflected in higher property prices (hedonic pricing theory). In Greater Paris, most major employment hubs are concentrated in central Paris and inner-ring business districts like La Défense, while road traffic is heavily congested. Therefore, living close to a reliable rail station is a major advantage for commuters.
 
 Comparing the three concentric rings of Île-de-France makes this question especially interesting. Inside Paris (75), Metro stations are everywhere—usually within a few hundred meters—so being slightly closer to a station may not change prices much. In contrast, in the Petite Couronne (92, 93, 94) and especially the Grande Couronne (77, 78, 91, 95), stations are much farther apart and serve as essential commuter links into the urban core. We expect walking-distance access to an RER or train station in the suburbs to carry a much stronger price premium than in the city center.
 
-6. Data Cleaning & Merging PlanBecause the DVF housing records and IDFM transit stops do not share a common ID column, we prepare and match them through the following steps:Residential Filtering (DVF): Keep only residential sales (Appartement and Maison) with valid positive prices and living areas, remove duplicate multi-lot records, and trim extreme outliers (under €1,000/$m^2$ or over €30,000/$m^2$).Urban Ring Grouping: Classify each property into Paris Intra-Muros (75), Petite Couronne (92, 93, 94), or Grande Couronne (77, 78, 91, 95) using Code.departement.Rail Transit Filtering (IDFM): Filter the IDFM table to keep fixed-guideway transit (Metro, RER, Train, Tramway) and exclude regular street buses.Spatial Distance Matching (sf): In the next phase, project both datasets onto the French metric coordinate system (Lambert 93 / EPSG:2154) using the sf package to calculate the exact distance (in meters) from each house/apartment to the nearest rail station.
-## 7. Exploratory Plot of Target Variable (`price_m2`)
+6.  Data Cleaning & Merging PlanBecause the DVF housing records and IDFM transit stops do not share a common ID column, we prepare and match them through the following steps:Residential Filtering (DVF): Keep only residential sales (Appartement and Maison) with valid positive prices and living areas, remove duplicate multi-lot records, and trim extreme outliers (under €1,000/$m^2$ or over €30,000/$m^2$).Urban Ring Grouping: Classify each property into Paris Intra-Muros (75), Petite Couronne (92, 93, 94), or Grande Couronne (77, 78, 91, 95) using Code.departement.Rail Transit Filtering (IDFM): Filter the IDFM table to keep fixed-guideway transit (Metro, RER, Train, Tramway) and exclude regular street buses.Spatial Distance Matching (sf): In the next phase, project both datasets onto the French metric coordinate system (Lambert 93 / EPSG:2154) using the sf package to calculate the exact distance (in meters) from each house/apartment to the nearest rail station. \## 7. Exploratory Plot of Target Variable (`price_m2`)
 
 ```{r}
 #| label: target-variable-plot
